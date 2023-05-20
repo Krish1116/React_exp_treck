@@ -1,0 +1,14 @@
+body {
+  overflow: hidden;
+}
+.title {
+  position: relative;
+  right: -12%;
+  top: 30px;
+}
+
+.update {
+  position: absolute;
+  top: 173px;
+  right: 80%;
+}
