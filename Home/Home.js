@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
 const Home = () => {
+  const navigate = useNavigate();
   const verifyEmail = async (e) => {
     e.preventDefault();
     try {
@@ -28,6 +29,11 @@ const Home = () => {
       console.log(err.message);
     }
   };
+  const logoutHandler = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+    alert("Logout SuccessFully");
+  };
   return (
     <>
       <div className=" mt-2 mb-2">
@@ -45,6 +51,11 @@ const Home = () => {
         </p>
       </div>
       <div className="mt-5" style={{ borderBottom: "3px solid black" }}></div>
+      <div style={{ position: "relative", top: "-65px", right: "-45px" }}>
+        <Button variant="outline-danger" onClick={logoutHandler}>
+          LogOut
+        </Button>{" "}
+      </div>
       <div style={{ position: "relative", top: "22px", right: "-42px" }}>
         <Button variant="outline-success" onClick={verifyEmail}>
           Verify Email
