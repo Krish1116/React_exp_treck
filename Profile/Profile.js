@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Col from "react-bootstrap/Col";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
@@ -11,9 +11,45 @@ import { useNavigate } from "react-router-dom";
 function Profile() {
   const nameInputRef = useRef();
   const photoUrlInputRef = useRef();
-  const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
-  // console.log(authCtx.token);
+  const authCtx = useContext(AuthContext);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch(
+          "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDNDfvfwu7PjWrSJOftKH9ssXItSzG7_yg",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              idToken: localStorage.getItem("token"),
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          const user = data.users[0];
+          console.log(user);
+          console.log(user.photoUrl);
+          console.log(user.displayName);
+
+          nameInputRef.current.value = user.displayName;
+          photoUrlInputRef.current.value = user.photoUrl;
+        } else {
+          console.log("Error:", res.status);
+        }
+      } catch (err) {
+        console.log(err.message);
+      }
+    }
+
+    fetchProfile();
+  }, []);
+
   const updateProfile = async (e) => {
     e.preventDefault();
     const enteredName = nameInputRef.current.value;
@@ -40,12 +76,11 @@ function Profile() {
       const data = await res.json();
       console.log("Response data:", data);
 
-      nameInputRef.current.value = "";
-      photoUrlInputRef.current.value = "";
-
       if (res.ok) {
         alert("Updated Successfully");
         navigate("/home");
+        nameInputRef.current.value = "";
+        photoUrlInputRef.current.value = "";
       } else {
         throw data.error;
       }
@@ -54,9 +89,24 @@ function Profile() {
     }
   };
 
+  const cancelHandler = () => {
+    navigate("/home");
+  };
+
   return (
     <>
+      <div className="main-update-profile">
+        <p className="mt-3">Winner never Quits , quitter never wins</p>
+        <h1 className="text-center mt-2">Update Profile</h1>
+        <div className="profile-update">
+          Your Profile is 64% complete . A complete Profile has <br />
+          higher chances of landing a job{" "}
+        </div>
+      </div>
       <h3 className="title">Contact Details</h3>
+      <Button variant="outline-danger" className="cln" onClick={cancelHandler}>
+        Cancel
+      </Button>
       <Row className="g-2">
         <Col md>
           <FloatingLabel
