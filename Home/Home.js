@@ -34,6 +34,9 @@ const Home = () => {
     navigate("/");
     alert("Logout SuccessFully");
   };
+  const expHandler = () => {
+    navigate("/expenses");
+  };
   return (
     <>
       <div className=" mt-2 mb-2">
@@ -59,6 +62,11 @@ const Home = () => {
       <div style={{ position: "relative", top: "22px", right: "-42px" }}>
         <Button variant="outline-success" onClick={verifyEmail}>
           Verify Email
+        </Button>{" "}
+      </div>
+      <div style={{ position: "relative", top: "-16px", right: "-23%" }}>
+        <Button variant="outline-info" onClick={expHandler} className="w-50">
+          Daily Expenses
         </Button>{" "}
       </div>
     </>
