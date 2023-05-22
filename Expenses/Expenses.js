@@ -1,8 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Form, FloatingLabel, Button } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import "./Expenses.css";
 import { useNavigate } from "react-router-dom";
+import ExpenseItem from "./ExpenseItem";
 
 const Expenses = () => {
   const amoutInputref = useRef();
@@ -14,7 +15,8 @@ const Expenses = () => {
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
   };
-  const expHandler = (e) => {
+
+  const expHandler = async (e) => {
     e.preventDefault();
     const enteredAmount = amoutInputref.current.value;
     const enteredDes = desInputRef.current.value;
@@ -26,6 +28,30 @@ const Expenses = () => {
       description: enteredDes,
       category: selectedCategory,
     };
+    try {
+      const res = await fetch(
+        `https://expensetracker-d6e2d-default-rtdb.firebaseio.com/Expenses.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newExpenses),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        alert("Expenses added Successfully");
+        amoutInputref.current.value = "";
+        desInputRef.current.value = "";
+        setSelectedCategory("");
+        // await fetchExpense
+      } else {
+        throw data.error;
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
 
     setExpenses((prev) => [...prev, newExpenses]);
   };
@@ -34,17 +60,71 @@ const Expenses = () => {
     navigate("/home");
   };
 
+  // it won't remove the printed data from the screen when you refresh the page.
+  const fetchExp = async () => {
+    try {
+      const res = await fetch(
+        `https://expensetracker-d6e2d-default-rtdb.firebaseio.com/Expenses.json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      console.log(data);
+      if (res.ok) {
+        const newData = [];
+        for (let key in data) {
+          newData.push({ id: key, ...data[key] });
+        }
+        setExpenses(newData);
+      } else {
+        throw data.error;
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchExp();
+  }, []);
+
+  const deleteItem = useCallback(async (item) => {
+    setExpenses((prevExpenses) => {
+      const updatedExpenses = prevExpenses.filter((exp) => exp.id !== item.id);
+      return updatedExpenses;
+    });
+  });
+
+  // const editItem = useCallback(async (item) => {
+  //   setExpenses((prev) => {
+  //     // find the index of the edited item in expense array
+  //     const editIndex = prev.findIndex((editItem) => item.id === editItem.id);
+
+  //     // if the item is found, update it with the edited data
+  //     if (editIndex !== -1) {
+  //       const updateExp = [...prev];
+  //       updateExp[editIndex] = editItem;
+  //       return updateExp;
+  //     }
+  //     return prev;
+  //   });
+  // }, []);
+
   return (
     <>
-      <h1 className="text-center mt-5">Daily Expenses</h1>
+      <h1 className="text-center mt-2">Daily Expenses</h1>
       <Button
         variant="primary"
-        style={{ position: "relative", right: "-25%", top: "16px" }}
+        style={{ position: "relative", right: "-90%", top: "-50px" }}
         onClick={goHomeHandler}
       >
         Go To Home
       </Button>{" "}
-      <div className="mt-5">
+      <div>
         {" "}
         <FloatingLabel
           controlId="floatingInput"
@@ -127,15 +207,17 @@ const Expenses = () => {
         </div>
         <div style={{ position: "relative", right: "-25%" }}>
           <h3>Expenses:</h3>
-          {expenses.map((expense, index) => (
-            <div key={index}>
-              <strong>Amount: </strong> {expense.amount} -
-              <strong>Description: </strong>
-              {expense.description} -<strong>Category:</strong>
-              {expense.category}
-            </div>
-          ))}
         </div>
+        {expenses.map((expense) => {
+          return (
+            <ExpenseItem
+              key={expense.id}
+              item={expense}
+              onDeleteItem={deleteItem}
+              // onEditItem={editItem}
+            />
+          );
+        })}
       </div>
     </>
   );
