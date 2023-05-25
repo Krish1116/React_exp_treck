@@ -1,0 +1,33 @@
+body {
+  overflow: hidden;
+}
+.title {
+  position: relative;
+  right: -12%;
+  top: 30px;
+}
+
+.update {
+  position: absolute;
+  top: 74%;
+  right: 80%;
+}
+
+.main-update-profile {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  border-bottom: 3px solid black;
+}
+.profile-update {
+  background: lightgray;
+  color: black;
+  padding: 0 3px;
+  border-radius: 5px;
+  padding: 0 10px;
+}
+
+.cln {
+  position: relative;
+  right: -82%;
+}

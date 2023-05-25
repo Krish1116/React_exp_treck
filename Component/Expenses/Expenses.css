@@ -1,0 +1,21 @@
+body {
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.expense-item__description {
+  display: grid;
+  color: white;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.expense-item {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  width: 45rem;
+  padding: 0.5rem;
+  margin: 1rem -15px;
+  background-color: #051e28;
+}
